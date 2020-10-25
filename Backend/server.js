@@ -39,6 +39,18 @@ app.post('/signin', (req,res) => {
   
 })
 
+
+
+app.put('/image', (req, res) => {
+
+  signin.update(req.body).then(data => res.status(200).json(data)).catch(err => {
+    res.json(err);
+  })
+})
+
+
+
+
 app.listen('4000', () => {
   console.log("Server is working!")
 });

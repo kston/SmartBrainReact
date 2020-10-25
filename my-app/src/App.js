@@ -33,11 +33,12 @@ class App extends Component {
 
 	CalculateFaceLocation = (data) => {
 		const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
-
-		console.log(clarifaiFace)
 		const image = document.getElementById('inputImage');
 		const width = Number(image.width)
 		const height = Number(image.height)
+
+		
+
 
 		return {
 		
@@ -45,10 +46,34 @@ class App extends Component {
 			topRow:  clarifaiFace.top_row * height,
 			rightCol: width - (clarifaiFace.right_col * width),
 			bottomRow: height - (clarifaiFace.bottom_row * height)
+
+			
 			
 		}
 
 		
+
+	}
+
+	countEntries = () => {
+
+		let displayedEntries =(document.getElementById('entries').innerText);
+			let count = parseInt(displayedEntries) + 1;
+		document.getElementById('entries').innerText = count;
+
+		var user= JSON.parse(localStorage.getItem('user'))
+
+		fetch('http://localhost:4000/image', {
+		method: "PUT",
+		headers: {'content-type': 'application/json'},
+		body: JSON.stringify({
+			id: user.id
+        
+      })
+    }).then(res => res[0]).catch(err => console.log(err))
+
+
+
 
 	}
 	onRouteChange = (route) => {
@@ -73,6 +98,8 @@ class App extends Component {
 		this.setState({imageURL: this.state.input})
 		app.models.predict(Clarifai.FACE_DETECT_MODEL,this.state.input).then(response => {
 			this.displayFaceBox(this.CalculateFaceLocation(response));
+			this.countEntries();
+			
 		}).catch(err => {
 			console.error(err)
 		})
@@ -116,7 +143,7 @@ class App extends Component {
             </div>
           : (
              route === 'signin'
-             ? <Signin  onRouteChange={this.onRouteChange}/>
+             ? <Signin loadUser={this.loadUser}  onRouteChange={this.onRouteChange}/>
              : <Register onRouteChange={this.onRouteChange}/>
             )
         }

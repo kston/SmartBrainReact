@@ -32,9 +32,11 @@ class Signin extends Component {
       })
     }).then(response => response.json()).then(data => {
       if(typeof data === 'object') {
+
+        localStorage.setItem('user', JSON.stringify(data));
         this.props.onRouteChange('home')
       } else {
-        alert(data);
+        alert('not possible to login');
       }
     })
 

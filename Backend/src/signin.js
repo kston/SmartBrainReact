@@ -25,13 +25,22 @@ module.exports = {
             const userPassword =  (await db('users').where({email: email,
                 }).select( 'password').then(data => data.map(item => item.password)))[0]
 
-             if(userPassword === null) {
+            
+
+             if(userPassword === undefined ) {
                  return "user not registed"
              }  else {
                  
                 if(await bcrypt.compare(password, userPassword)){
 
-                    return db('login').returning('*').insert({  email: email, hash: userPassword, logintime: new Date() })
+                    await db('login').returning('*').insert({  email: email, hash: userPassword, logintime: new Date() })
+
+                    return await db('users').where({email: email,
+                    }).select( 'id','name', 'entries').then(data => data[0]);
+
+                 
+
+                   
                     
                 }else {
                     return "password not match"
@@ -40,5 +49,25 @@ module.exports = {
                
              
         }
+
+        
+    },
+
+     async update(params){
+
+        const { id } = params;
+        try {
+           await db('users').where('id', '=', id)
+            .increment('entries', 1)
+            .returning('entries')
+
+        }catch(err) {
+             return err
+        } 
+        
+
+      
+
+
     }
 }
